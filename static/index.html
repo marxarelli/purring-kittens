@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Purring Kittens</title>
+<style>
+p {
+	text-align: center;
+}
+button {
+	font-size: 22pt;
+}
+button.on {
+	background: green;
+	content: 'off';
+}
+
+button.on > span.off {
+	display: none;
+}
+
+button.off {
+	background: red;
+	content: 'on';
+}
+
+button.off > span.on {
+	display: none;
+}
+</style>
+</head>
+	<body>
+		<h1>Kittens</h1>
+		<p>
+			<button id="toggle" class="off">
+				<span class="on">On</span>
+				<span class="off">Off</span>
+			</button>
+		</p>
+
+		<script type=text/javascript>
+			function change(prop, value, cb) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', prop);
+				xhr.setRequestHeader('Content-Type', 'application/json');
+				xhr.onload = function() {
+					if (xhr.status === 200) {
+						cb(JSON.parse(xhr.responseText));
+					} else {
+						console.log('request failed');
+					}
+				};
+				xhr.send(value === undefined ? value : JSON.stringify(value));
+			}
+
+			var toggle = document.getElementById('toggle');
+			toggle.addEventListener('click', function () {
+				change('toggle', undefined, function (state) {
+					toggle.className = state ? 'on' : 'off';
+				});
+			});
+		</script>
+	</body>
+</html>
