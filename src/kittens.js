@@ -1,7 +1,12 @@
 'use strict';
-const dualShock = require('dualshock-controller');
+const
+	dualShock = require('dualshock-controller'),
+	Emitter = require('events').EventEmitter,
+	util = require('util');
 
 const Controller = function() {
+	Emitter.call(this);
+
 	const
 		intensityStep = 10,
 		intervalStep = 200,
@@ -24,6 +29,7 @@ const Controller = function() {
 		isOn = false,
 		side = 0,
 		other = 0,
+		switched = false,
 		stimulating;
 
 	const stimulate = () => {
@@ -42,6 +48,7 @@ const Controller = function() {
 				rumbleLeft: 0,
 			});
 
+			this.emit('stimulate', { side: switched ? other : side, intensity: intensity });
 		} else {
 			ctrls[0].setExtras({
 				red: 255,
@@ -61,6 +68,7 @@ const Controller = function() {
 	for (var i = 0; i < ctrls.length; i++) {
 		var ctrl = ctrls[i];
 
+		ctrl.on("circle:press", d => this.switch());
 		ctrl.on("x:press", d => this.toggle());
 		ctrl.on("dpadRight:press", d => this.adjInterval(1));
 		ctrl.on("dpadLeft:press", d => this.adjInterval(-1));
@@ -77,6 +85,11 @@ const Controller = function() {
 
 		console.log('interval', interval);
 		console.log('intensity', intensity);
+
+		this.emit(
+			'change',
+			{ stimulating: isOn, interval: interval, intensity: intensity }
+		);
 	};
 
 	this.adjIntensity = (val) => {
@@ -98,10 +111,14 @@ const Controller = function() {
 	};
 
 	this.setInterval = (value) => {
-		interval = Math.max(value, 0);
+		interval = Math.max(value, 200);
 		this.reset();
 
 		return interval;
+	};
+
+	this.switch = () => {
+		switched = switched ? false : true;
 	};
 
 	this.toggle = () => {
@@ -121,6 +138,8 @@ const Controller = function() {
 		this.reset();
 	};
 }
+
+util.inherits(Controller, Emitter);
 
 module.exports = {
 	Controller: Controller,

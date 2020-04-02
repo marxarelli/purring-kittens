@@ -8,9 +8,14 @@ const
 
 const page = fs.readFileSync(path.resolve(__dirname, '../static/index.html'));
 
-const Server = function(hostname, port) {
-	hostname = hostname || '127.0.0.1';
-	port = port || 5177;
+const defaults = {
+	hostname: '127.0.0.1',
+	port: 5177,
+	upgrader: undefined
+};
+
+const Server = function(options) {
+	options = Object.assign({}, defaults, options);
 
 	var kctrl;
 
@@ -57,11 +62,17 @@ const Server = function(hostname, port) {
 		}
 	});
 
+	if (options.upgrader !== undefined) {
+		server.on('upgrade', (request, socket, head) => {
+			options.upgrader(request, socket, head, kctrl);
+		});
+	}
+
 	this.start = () => {
 		kctrl = new kittens.Controller();
 
-		server.listen(port, hostname, () => {
-			console.log(`Server running at http://${hostname}:${port}/`);
+		server.listen(options.port, options.hostname, () => {
+			console.log(`Server running at http://${options.hostname}:${options.port}/`);
 		});
 	};
 
