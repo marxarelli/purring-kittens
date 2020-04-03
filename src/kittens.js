@@ -111,7 +111,7 @@ const Controller = function() {
 	};
 
 	this.setInterval = (value) => {
-		interval = Math.max(value, 200);
+		interval = Math.max(Math.min(value, 5000), 200);
 		this.reset();
 
 		return interval;

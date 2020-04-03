@@ -3,16 +3,38 @@
 <head>
 <title>Purring Kittens</title>
 <style>
+body, h1, p, button {
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
 h1 {
 	text-align: center;
+	font-weight: normal;
 }
 
 p.control {
 	text-align: center;
 }
 
-button#toggle span {
-	font-size: 22pt;
+button#toggle {
+	display: inline-block;
+	padding: 0.35em 1.2em;
+	border: none;
+	margin: 0 0.3em 0.3em 0;
+	border-radius: 0.12em;
+	box-sizing: border-box;
+	color: white;
+	background-color: #f0386b;
+	text-align: center;
+	transition: all 0.3s;
+}
+
+button#toggle:hover{
+	background-color: #25ced1;
+}
+
+button#toggle span, label {
+	font-size: 14pt;
 }
 
 body > div {
@@ -33,7 +55,7 @@ body > div > div {
 }
 
 body.on > div > div {
-	background-image: linear-gradient(to left, #f0386b, white, #6b2d5c);
+	background-image: linear-gradient(to left, #f0386b, #fceade 35%);
 }
 
 body.on > div > div::before {
@@ -45,34 +67,12 @@ body.on > div > div::before {
 	left: 0;
 	z-index: -1;
 
-	background-image: linear-gradient(to right, #f0386b, white, #6b2d5c);
-	transition: opacity 0.6s ease-in-out;
+	background-image: linear-gradient(to right, #f0386b, #fceade 35%);
+	transition: opacity 0.8s ease-in-out;
 	opacity: 0;
 }
 
 body.on.right > div > div::before {
-	opacity: 1;
-}
-
-body .kitten, body > .kitten > img {
-	transition:
-		transform 0.8s ease-in-out,
-		opacity 0.3s ease-in-out;
-}
-
-body .kitten > img {
-	opacity: 0;
-}
-
-body.right .kitten {
-	transform: translateX(100%);
-}
-
-body.right .kitten > img {
-	transform: translateX(-100%);
-}
-
-body.on .kitten > img {
 	opacity: 1;
 }
 
@@ -98,24 +98,18 @@ body.on button#toggle > span.off {
 
 <div><div>
 
-<h1>Purring Kittens</h1>
-<!--
-<p class="kitten">
-	<img
-	 src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Cute_grey_kitten.jpg/320px-Cute_grey_kitten.jpg"/>
-</p>
--->
+<h1>*purring kittens*</h1>
 <p class="control">
 	<button id="toggle">
-		<span class="on">Stop</span>
-		<span class="off">Start</span>
+		<span class="on">stop</span>
+		<span class="off">start</span>
 	</button>
 </p>
 <p class="control">
-	<label for="interval">Interval</label>
+	<label for="interval">interval (<span id="current-interval">2</span> seconds)</label>
 	<input id="interval" type="range" min="200" max="5000" step="200" value="2000"/>
 
-	<label for="intensity">Intensity</label>
+	<label for="intensity">intensity (<span id="current-intensity">60</span>/255)</label>
 	<input id="intensity" type="range" min="0" max="255" step="10" value="60"/>
 </p>
 
@@ -127,7 +121,9 @@ var ws = new WebSocket('ws://' + location.hostname + ':' + location.port + '/ws'
 var frame = document.body;
 var toggler = document.getElementById('toggle');
 var interval = document.getElementById('interval');
+var intervalValue = document.getElementById('current-interval');
 var intensity = document.getElementById('intensity');
+var intensityValue = document.getElementById('current-intensity');
 
 function change(prop, value) {
 	var args = [prop];
@@ -164,7 +160,8 @@ ws.onmessage = function(event) {
 		case 'change':
 			frame.classList[event.data.stimulating ? 'add' : 'remove']('on');
 			interval.value = event.data.interval;
-			intensity.value = event.data.intensity;
+			intervalValue.innerHTML = event.data.interval / 1000;
+			intensityValue.innerHTML = intensity.value = event.data.intensity;
 			break;
 		case 'stimulate':
 			frame.classList[event.data.side == 1 ? 'add' : 'remove']('right');
