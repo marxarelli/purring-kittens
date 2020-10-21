@@ -28,6 +28,7 @@ wss.on('connection', (ws, kctrl) => {
 });
 
 new Server({
+	hostname: process.env['KITTENS_ADDR'] || '127.0.0.1',
 	upgrader: (request, socket, head, kctrl) => {
 		const pathname = url.parse(request.url).pathname;
 

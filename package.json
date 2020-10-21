@@ -1,20 +1,20 @@
 {
-  "name": "kittens",
+  "name": "purring-kittens",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js",
-    "server": "node serve.js"
+    "console": "node main.js",
+    "start": "node websocket.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Daniel Duvall <dan@mutual.io>",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": "^6.10.2"
   },
   "dependencies": {
-    "dualshock-controller": "file:///Users/dduvall/src/node-dualshock-controller",
+    "dualshock-controller": "github:marxarelli/node-dualshock-controller#feature/multi-controller-support",
     "ws": "^7.2.3"
   }
 }
